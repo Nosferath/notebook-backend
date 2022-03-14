@@ -1,0 +1,2 @@
+# phonebook-backend
+This is my submission for the phonebook assignment in part 3 of the [FullStackOpen](https://fullstackopen.com/) course. The deployed app in Heroku is available in [https://infinite-fortress-68002.herokuapp.com/](https://infinite-fortress-68002.herokuapp.com/).
