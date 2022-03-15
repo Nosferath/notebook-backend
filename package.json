@@ -6,7 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf frontend-build && cd ../phonebook && npm run build && cp -r build ../phonebook-backend && cd ../phonebook-backend && mv build frontend-build",
+    "deploy": "git push heroku HEAD:master",
+    "deploy:full": "npm run build:ui && git add . && git commit -m autobuild && npm run deploy",
+    "logs:prod": "heroku logs --tail"
   },
   "author": "Claudio Yanez",
   "license": "UNLICENSED",
