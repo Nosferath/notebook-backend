@@ -2,6 +2,7 @@ require("dotenv").config();
 const morgan = require("morgan");
 const express = require("express");
 const Person = require("./models/person");
+const { response } = require("express");
 const app = express();
 
 app.use(express.json());
@@ -57,18 +58,19 @@ app.delete("/api/persons/:id", (request, response, next) => {
 // POSTing a new person
 app.post("/api/persons", async (request, response, next) => {
   const body = request.body;
-  // Should I perform this error handling in the middleware??
-  // Ensure fields are present
-  if (!body.name) {
-    return response.status(400).json({
-      error: "name missing",
-    });
-  }
-  if (!body.number) {
-    return response.status(400).json({
-      error: "number missing",
-    });
-  }
+  // // Ensure fields are present
+  // NO LONGER NEEDED DUE TO VALIDATION?
+  // if (!body.name) {
+  //   return response.status(400).json({
+  //     error: "name missing",
+  //   });
+  // }
+  // if (!body.number) {
+  //   return response.status(400).json({
+  //     error: "number missing",
+  //   });
+  // }
+
   // Handle name already in phonebook
   const reqName = body.name;
   const foundPersons = await Person.find({ name: { $eq: reqName } }).catch(
@@ -100,12 +102,28 @@ app.put("/api/persons/:id", (request, response, next) => {
     number: body.number,
   };
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(request.params.id, person, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
     .then((updatedNote) => {
       response.json(updatedNote);
     })
     .catch((error) => next(error));
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+  if (error.name === "ValidationError") {
+    return response
+      .status(400)
+      .send({ error: error.message, name: error.name });
+  }
+
+  next(error);
+};
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
