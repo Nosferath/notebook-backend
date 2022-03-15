@@ -2,14 +2,13 @@ require("dotenv").config();
 const morgan = require("morgan");
 const express = require("express");
 const Person = require("./models/person");
-const { response } = require("express");
 const app = express();
 
 app.use(express.json());
 app.use(express.static("frontend-build"));
 
 // Define a reqbody token to log the body of the request
-morgan.token("reqbody", (req, res) => {
+morgan.token("reqbody", (req) => {  // args were (req, res)
   return JSON.stringify(req.body);
 });
 
@@ -37,19 +36,17 @@ app.get("/api/persons", (request, response, next) => {
 });
 
 app.get("/api/persons/:id", (request, response, next) => {
-  const reqId = Number(request.params.id);
   Person.findById(request.params.id)
     .then((person) => response.json(person))
     .catch((error) => next(error));
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
-  const reqId = Number(request.params.id);
   // 404 on not found id could be implemented and
   // still be idempotent. It will not be done in
   // this case
   Person.findByIdAndRemove(request.params.id)
-    .then((result) => {
+    .then( () => {  // arg was result
       response.status(204).end();
     })
     .catch((error) => next(error));

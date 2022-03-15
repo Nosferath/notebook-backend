@@ -5,7 +5,7 @@ const url = process.env.MONGODB_URI;
 console.log("Connecting to database");
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => { // arg was result
     console.log("Connected to MongoDB");
   })
   .catch((error) => {
@@ -22,9 +22,9 @@ const personSchema = new mongoose.Schema({
     type: String,
     minlength: 8,
     validate: {
-      validator: v => {
-        return /^\d{2,3}-?\d{1,}$/.test(v)
-      }
+      // Only numbers and up to a single hyphen allowed
+      // If a hyphen is present, only 2 or 3 numbers must be before it
+      validator: v => /^\d{2,3}-?\d{1,}$/.test(v)
     },
     required: true
   }
